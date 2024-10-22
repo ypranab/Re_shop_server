@@ -30,7 +30,7 @@ async function run() {
 
     const phonesCollection = client.db("phoneResaleDB").collection("phones");
     const usersCollection = client.db("phoneResaleDB").collection("users");
-	const brandsCollection = client.db("phoneResaleDB").collection("brands");
+    const brandsCollection = client.db("phoneResaleDB").collection("brands");
     const bookingCollection = client.db("phoneResaleDB").collection("bookings");
 
     // Send a ping to confirm a successful connection
@@ -38,24 +38,34 @@ async function run() {
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+	
+	app.get("/home", (req, res) => {
+      const products = {}
+      res.send(products);
+    });
 
     app.get("/products", async (req, res) => {
       const products = await phonesCollection.find().toArray();
       res.send(products);
     });
-	
-	app.get('/category/:brand', async (req, res) => {
-            const brand = req.params.brand
-            const query = { brand: brand }
-            const result = await phonesCollection.find(query).toArray();
-            res.send(result)
+
+    app.get("/category/:brand", async (req, res) => {
+      const brand = req.params.brand;
+      const query = { brand: brand };
+      const result = await phonesCollection.find(query).toArray();
+      res.send(result);
     });
-	
-	app.get('/brands', async (req, res) => {
-            const query = {  }
-            const result = await brandsCollection.find(query).toArray();
-            res.send(result)
-        })
+	app.get("/home", async (req, res) => {
+      const query = {};
+      const result = await brandsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/brands", async (req, res) => {
+      const query = {};
+      const result = await brandsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.get("/users", async (req, res) => {
       const query = usersCollection.find();
@@ -65,10 +75,8 @@ async function run() {
 
     app.get("/user/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
-      const query = { _id: new ObjectId(id) };
+      const query = { userId: id };
       const result = await usersCollection.findOne(query);
-      console.log(result);
       res.send(result);
     });
 

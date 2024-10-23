@@ -7,12 +7,13 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
+app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Phone Re Shop Server is Running.");
+  res.send("Re Shop Server is Running.");
 });
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nslo89v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://dbuser:K0Xd2F1usJV6yUUb@cluster0.nslo89v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -26,23 +27,16 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
+    app.get("/home", (req, res) => {
+      res.send("Response sending");
+    });
+
     await client.connect();
 
     const phonesCollection = client.db("phoneResaleDB").collection("phones");
     const usersCollection = client.db("phoneResaleDB").collection("users");
     const brandsCollection = client.db("phoneResaleDB").collection("brands");
     const bookingCollection = client.db("phoneResaleDB").collection("bookings");
-
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
-	
-	app.get("/home", (req, res) => {
-      const products = {}
-      res.send(products);
-    });
 
     app.get("/products", async (req, res) => {
       const products = await phonesCollection.find().toArray();
@@ -53,11 +47,6 @@ async function run() {
       const brand = req.params.brand;
       const query = { brand: brand };
       const result = await phonesCollection.find(query).toArray();
-      res.send(result);
-    });
-	app.get("/home", async (req, res) => {
-      const query = {};
-      const result = await brandsCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -96,7 +85,7 @@ async function run() {
       console.log({ user });
       const updatedUser = {
         $set: {
-          displayName: user.displayName,
+          name: user.displayName,
           email: user.email,
           phone: user.phone,
           photoUrl: user.photoUrl,
@@ -120,15 +109,41 @@ async function run() {
       const result = await userCollection.deleteOne(query);
       res.send(result);
     });
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).send("Internal Server Error");
+
+    //add a phone
+    app.post("/phones", async (req, res) => {
+      const phone = req.body;
+      const result = await phonesCollection.insertOne(phone);
+      res.send(result);
+    });
+
+    // get all bookings
+    app.get("/bookings", async (req, res) => {
+      const query = {};
+      const bookings = await bookingCollection.find(query).toArray();
+      res.send(bookings);
+    });
+
+    // get bookings of a user
+    app.get("/bookings/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      //console.log(decodedEmail)
+      const bookings = await bookingCollection.find(query).toArray();
+      res.send(bookings);
+    });
+
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      const bookings = await bookingCollection.insertOne(booking);
+      res.send(bookings);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     //await client.close();
   }
 }
-run().catch(console.dir);
+run().catch((error) => console.log(error));
 
 app.listen(port, () => {
   console.log(`Server is Running on Port ${port}`);

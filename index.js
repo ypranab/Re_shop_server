@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
   res.send("Re Shop Server is Running.");
 });
 
-const uri = `mongodb+srv://dbuser:K0Xd2F1usJV6yUUb@cluster0.nslo89v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nslo89v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {

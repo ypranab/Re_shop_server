@@ -80,21 +80,22 @@ async function run() {
     app.put("/user/:id", async (req, res) => {
       const id = req.params.id;
       const user = req.body;
-      const filter = { _id: new ObjectId(id) };
+      const filter = { userId: id };
       const option = { upsert: true };
-      console.log({ user });
+      //console.log({ user });
       const updatedUser = {
         $set: {
-          name: user.displayName,
+          name: user.name,
           email: user.email,
           phone: user.phone,
           photoUrl: user.photoUrl,
           address: user.address,
-          //isAdmin: user.isAdmin,
+		  isAdmin: user.isAdmin,
+		  role: "admin"
         },
       };
 
-      const result = await userCollection.updateOne(
+      const result = await usersCollection.updateOne(
         filter,
         updatedUser,
         option
@@ -105,8 +106,8 @@ async function run() {
     // Delete user by id
     app.delete("/user/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await userCollection.deleteOne(query);
+      const query = { userId: id };
+      const result = await usersCollection.deleteOne(query);
       res.send(result);
     });
 

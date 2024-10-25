@@ -117,6 +117,47 @@ async function run() {
       const result = await phonesCollection.insertOne(phone);
       res.send(result);
     });
+	
+	//update a phone by id
+	app.put("/product/:id", async (req, res) => {
+      const id = req.params.id;
+	  console.log(id);
+      const phone = req.body;
+	  console.log(phone);
+      const filter = { _id: new ObjectId(id) };
+      const option = { upsert: true };
+      //console.log({ user });
+      const updatedPhone = {
+        $set: {
+          name: phone.name,
+          email: phone.email,
+          brand: phone.brand,
+		  price: phone.price,
+		  location: phone.location,
+          image: phone.image,
+          condition	: phone.condition,
+		  resalePrice: phone.resalePrice,
+		  year: phone.year,
+		  status: phone.status,
+        },
+      };
+
+      const result = await phonesCollection.updateOne(
+        filter,
+        updatedPhone,
+        option
+      );
+      res.send(result);
+    });
+	
+	// Delete phone by id
+    app.delete("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await phonesCollection.deleteOne(query);
+      res.send(result);
+    });
+
 
     // get all bookings
     app.get("/bookings", async (req, res) => {

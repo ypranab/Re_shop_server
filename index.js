@@ -55,6 +55,13 @@ async function run() {
       const result = await brandsCollection.find(query).toArray();
       res.send(result);
     });
+	
+	// add brand 
+	app.post("/brands",  async (req, res) => {
+      const brand = req.body;
+      const result = await brandsCollection.insertOne(brand);
+      res.send(result);
+    });
 
     app.get("/users", async (req, res) => {
       const query = usersCollection.find();
@@ -121,9 +128,7 @@ async function run() {
 	//update a phone by id
 	app.put("/product/:id", async (req, res) => {
       const id = req.params.id;
-	  console.log(id);
       const phone = req.body;
-	  console.log(phone);
       const filter = { _id: new ObjectId(id) };
       const option = { upsert: true };
       //console.log({ user });

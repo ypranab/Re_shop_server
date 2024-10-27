@@ -31,7 +31,7 @@ async function run() {
       res.send("Response sending");
     });
 
-    await client.connect();
+    //await client.connect();
 
     const phonesCollection = client.db("phoneResaleDB").collection("phones");
     const usersCollection = client.db("phoneResaleDB").collection("users");
@@ -124,6 +124,14 @@ async function run() {
       const result = await phonesCollection.insertOne(phone);
       res.send(result);
     });
+	
+	// single product details
+	app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+	  const result = await phonesCollection.findOne(filter);
+	  res.send(result);
+	});
 	
 	//update a phone by id
 	app.put("/product/:id", async (req, res) => {
